@@ -1,0 +1,21 @@
+[package]
+name = "snap-push"
+version = "0.1.0"
+authors = ["Kyluke McDougall <kyluke.m@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.4.2"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+fcm = "0.6.0"
+rusqlite = "0.20.0"
+rand = "0.7.0"
+
+[dependencies.rocket_contrib]
+version = "0.4.2"
+default-features = false
+features = ["json"]
