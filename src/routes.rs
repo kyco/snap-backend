@@ -135,7 +135,7 @@ pub fn register(mut request_data: Json<User>) -> Result<Json<User>, Json<JsonGen
 
 // performs the registration
 pub fn register_do(user_data: &mut User) -> Result<i32, String> {
-    // Generate FNV from token
+    // Generate random id from token
     match user_data.generate_id() {
         Ok(_) => {
             // Check if the user exists, if he does, then return
