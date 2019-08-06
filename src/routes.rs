@@ -24,7 +24,7 @@ pub struct Key {
     pub key: String,
 }
 
-// TODO: This example can be improved by using `route` with multiple HTTP verbs.
+// Send push notification to paired device
 #[post("/", format = "json", data = "<message>")]
 pub fn send(message: Json<Message>) -> Json<JsonGeneric> {
     // Check if the from device ID exists
@@ -75,7 +75,7 @@ pub fn send(message: Json<Message>) -> Json<JsonGeneric> {
     return JsonGeneric::new_ok("ok".to_string());
 }
 
-// TODO: This example can be improved by using `route` with multiple HTTP verbs.
+// Pair two devices
 #[post("/", format = "json", data = "<pair>")]
 pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
     // Check if my_device exists
@@ -124,7 +124,7 @@ pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
     }
 }
 
-// TODO: This example can be improved by using `route` with multiple HTTP verbs.
+// Register a new device
 #[post("/", format = "json", data = "<request_data>")]
 pub fn register(mut request_data: Json<User>) -> Result<Json<User>, Json<JsonGeneric>> {
     match register_do(&mut request_data) {
@@ -166,6 +166,7 @@ pub fn register_do(user_data: &mut User) -> Result<i32, String> {
     Ok(0)
 }
 
+// Get public key of paired device
 #[post("/", format = "json", data = "<request_data>")]
 pub fn get_key(request_data: Json<Pairing>) -> Result<Json<Key>, Json<JsonGeneric>> {
     // check if the devices are paired.
