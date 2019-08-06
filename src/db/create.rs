@@ -18,7 +18,7 @@ pub fn create() -> Result<()> {
     )?;
 
     conn.execute(
-        "create table if not exists relationships (
+        "create table if not exists pairing (
              id integer primary key,
              device_one text not null,
              device_two text not null,

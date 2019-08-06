@@ -1,3 +1,3 @@
 pub mod create;
-pub mod relationships;
+pub mod paired;
 pub mod users;
