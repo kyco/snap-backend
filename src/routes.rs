@@ -2,6 +2,7 @@
 use crate::db::paired::{create, is_paired};
 use crate::db::users::device_id_exists;
 use crate::db::users::User;
+use crate::json_generic::{JsonGeneric, JsonGenericCodes};
 use rocket_contrib::json::Json;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -9,12 +10,6 @@ pub struct Message {
     pub from: String,
     pub to: String,
     pub contents: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Pair {
-    pub device_one: String,
-    pub device_two: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -27,47 +22,6 @@ pub struct Pairing {
 pub struct Key {
     pub id: String,
     pub key: String,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct JsonGeneric {
-    pub satus: JsonGenericCodes,
-    pub reason: String,
-}
-
-impl JsonGeneric {
-    // return a new json code
-    pub fn new_response(c: JsonGenericCodes, r: String) -> Json<JsonGeneric> {
-        Json(JsonGeneric {
-            satus: c,
-            reason: r,
-        })
-    }
-    // return a new json generic error
-    pub fn new_generic(r: String) -> Json<JsonGeneric> {
-        Json(JsonGeneric {
-            satus: JsonGenericCodes::Generic,
-            reason: r,
-        })
-    }
-    // return a new json ok response
-    pub fn new_ok(r: String) -> Json<JsonGeneric> {
-        Json(JsonGeneric {
-            satus: JsonGenericCodes::OK,
-            reason: r,
-        })
-    }
-}
-
-// Contains error codes for json responses
-#[derive(Serialize, Deserialize, Debug)]
-pub enum JsonGenericCodes {
-    OK,
-    Generic,
-    NotFound,
-    NotRegistered,
-    NotPaired,
-    AlreadyRegistered,
 }
 
 // TODO: This example can be improved by using `route` with multiple HTTP verbs.
@@ -118,20 +72,19 @@ pub fn send(message: Json<Message>) -> Json<JsonGeneric> {
         }
     };
 
-    println!("{:#?}", message);
     return JsonGeneric::new_ok("ok".to_string());
 }
 
 // TODO: This example can be improved by using `route` with multiple HTTP verbs.
 #[post("/", format = "json", data = "<pair>")]
-pub fn pair(pair: Json<Pair>) -> Json<JsonGeneric> {
-    // Check if device_one exists
-    match device_id_exists(&pair.device_one) {
+pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
+    // Check if my_device exists
+    match device_id_exists(&pair.my_device) {
         Ok(result) => {
             if result == false {
                 return JsonGeneric::new_response(
                     JsonGenericCodes::NotFound,
-                    "device_one: ".to_owned() + &pair.device_one + " doesn't exist",
+                    "my_device: ".to_owned() + &pair.my_device + " doesn't exist",
                 );
             }
         }
@@ -140,13 +93,13 @@ pub fn pair(pair: Json<Pair>) -> Json<JsonGeneric> {
         }
     };
 
-    // check if device_two exists
-    match device_id_exists(&pair.device_two) {
+    // check if other_device exists
+    match device_id_exists(&pair.other_device) {
         Ok(result) => {
             if result == false {
                 return JsonGeneric::new_response(
                     JsonGenericCodes::NotFound,
-                    "device_two: ".to_owned() + &pair.device_two + " doesn't exist",
+                    "other_device: ".to_owned() + &pair.other_device + " doesn't exist",
                 );
             }
         }
@@ -156,7 +109,7 @@ pub fn pair(pair: Json<Pair>) -> Json<JsonGeneric> {
     };
 
     // If both exist, then add them into the relationship database
-    match create(&pair.device_one, &pair.device_two) {
+    match create(&pair.my_device, &pair.other_device) {
         Ok(result) => {
             if result == true {
                 return JsonGeneric::new_ok("ok".to_string());
@@ -210,8 +163,6 @@ pub fn register_do(user_data: &mut User) -> Result<i32, String> {
         }
     };
 
-    println!("{:#?}", user_data);
-
     Ok(0)
 }
 
@@ -224,7 +175,9 @@ pub fn get_key(request_data: Json<Pairing>) -> Result<Json<Key>, Json<JsonGeneri
             if result == false {
                 return Err(JsonGeneric::new_response(
                     JsonGenericCodes::NotPaired,
-                    request_data.my_device.to_string() + " is not paired with " + &request_data.other_device,
+                    request_data.my_device.to_string()
+                        + " is not paired with "
+                        + &request_data.other_device,
                 ));
             }
         }

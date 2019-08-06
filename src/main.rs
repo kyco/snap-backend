@@ -9,6 +9,7 @@ extern crate serde_derive;
 extern crate rusqlite;
 
 mod db;
+mod json_generic;
 mod routes;
 
 // GLOBALS
