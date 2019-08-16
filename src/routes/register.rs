@@ -1,11 +1,11 @@
 use crate::db::users::User;
-use crate::routes::json_generic::{JsonGeneric,JsonGenericCodes};
+use crate::routes::json_generic::JsonGeneric;
+use rocket::response::status::BadRequest;
 use rocket_contrib::json::Json;
-use rocket::response::status;
 
 // Register a new device
 #[post("/", format = "json", data = "<request_data>")]
-pub fn register(mut request_data: Json<User>) -> Result<Json<User>, status<Json<JsonGeneric>>> {
+pub fn register(mut request_data: Json<User>) -> Result<Json<User>, BadRequest<Json<JsonGeneric>>> {
     match register_do(&mut request_data) {
         Ok(_) => Ok(request_data),
         Err(e) => Err(JsonGeneric::new_bad_request_generic(e.to_string())),

@@ -1,6 +1,7 @@
 use crate::db::paired::create;
 use crate::db::users::device_id_exists;
 use crate::routes::json_generic::{JsonGeneric, JsonGenericCodes};
+use rocket::response::status::BadRequest;
 use rocket_contrib::json::Json;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -11,19 +12,19 @@ pub struct Pairing {
 
 // Pair two devices
 #[post("/", format = "json", data = "<pair>")]
-pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
+pub fn pair(pair: Json<Pairing>) -> Result<Json<JsonGeneric>, BadRequest<Json<JsonGeneric>>> {
     // Check if my_device exists
     match device_id_exists(&pair.my_device) {
         Ok(result) => {
             if result == false {
-                return JsonGeneric::new_response(
+                return Err(JsonGeneric::new_bad_request(
                     JsonGenericCodes::NotFound,
                     "my_device: ".to_owned() + &pair.my_device + " doesn't exist",
-                );
+                ));
             }
         }
         Err(err) => {
-            return JsonGeneric::new_generic(err.to_string());
+            return Err(JsonGeneric::new_bad_request_generic(err.to_string()));
         }
     };
 
@@ -31,14 +32,14 @@ pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
     match device_id_exists(&pair.other_device) {
         Ok(result) => {
             if result == false {
-                return JsonGeneric::new_response(
+                return Err(JsonGeneric::new_bad_request(
                     JsonGenericCodes::NotFound,
                     "other_device: ".to_owned() + &pair.other_device + " doesn't exist",
-                );
+                ));
             }
         }
         Err(err) => {
-            return JsonGeneric::new_generic(err.to_string());
+            return Err(JsonGeneric::new_bad_request_generic(err.to_string()));
         }
     };
 
@@ -46,14 +47,14 @@ pub fn pair(pair: Json<Pairing>) -> Json<JsonGeneric> {
     match create(&pair.my_device, &pair.other_device) {
         Ok(result) => {
             if result == true {
-                return JsonGeneric::new_ok("ok".to_string());
+                return Ok(JsonGeneric::new_ok("ok".to_string()));
             } else {
-                return JsonGeneric::new_response(
+                return Err(JsonGeneric::new_bad_request(
                     JsonGenericCodes::NotFound,
                     "could not find devices".to_string(),
-                );
+                ));
             }
         }
-        Err(e) => JsonGeneric::new_generic(e.to_string()),
+        Err(e) => Err(JsonGeneric::new_bad_request_generic(e.to_string())),
     }
 }

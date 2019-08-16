@@ -1,10 +1,9 @@
 use crate::db::paired::is_paired;
 use crate::db::users::User;
-use crate::routes::generics::not_found;
 use crate::routes::json_generic::{JsonGeneric, JsonGenericCodes};
 use crate::routes::pair::Pairing;
 use rocket_contrib::json::Json;
-use rocket::response::status;
+use rocket::response::status::BadRequest;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Key {
@@ -14,7 +13,7 @@ pub struct Key {
 
 // Get public key of paired device
 #[post("/", format = "json", data = "<request_data>")]
-pub fn get_key(request_data: Json<Pairing>) -> Result<Json<Key>, status<Json<JsonGeneric>>> {
+pub fn get_key(request_data: Json<Pairing>) -> Result<Json<Key>, BadRequest<Json<JsonGeneric>>> {
     // check if the devices are paired.
     // only paired devices are allowed to see each other's keys
     match is_paired(&request_data.my_device, &request_data.other_device) {
@@ -40,8 +39,7 @@ pub fn get_key(request_data: Json<Pairing>) -> Result<Json<Key>, status<Json<Jso
             key: result,
         })),
         Err(e) => {
-            println!("{:?}", e);
-            return Err(not_found());
+            return Err(JsonGeneric::new_bad_request_generic(e.to_string()));
         }
     }
 }
