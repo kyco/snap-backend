@@ -1,5 +1,6 @@
 // Generic json responses
 use rocket_contrib::json::Json;
+use rocket::response::status::BadRequest;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct JsonGeneric {
@@ -21,6 +22,20 @@ impl JsonGeneric {
             satus: JsonGenericCodes::Generic,
             reason: r,
         })
+    }
+    // return a new json generic error
+    pub fn new_bad_request(c: JsonGenericCodes, r: String) -> BadRequest<Json<JsonGeneric>> {
+        BadRequest(Some(Json(JsonGeneric {
+            satus: c,
+            reason: r,
+        })))
+    }
+    // return a new json generic error
+    pub fn new_bad_request_generic(r: String) -> BadRequest<Json<JsonGeneric>> {
+        BadRequest(Some(Json(JsonGeneric {
+            satus: JsonGenericCodes::Generic,
+            reason: r,
+        })))
     }
     // return a new json ok response
     pub fn new_ok(r: String) -> Json<JsonGeneric> {

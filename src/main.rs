@@ -6,9 +6,10 @@ extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 extern crate rusqlite;
+extern crate tokio;
 
 mod db;
-mod json_generic;
+mod push;
 mod routes;
 
 // GLOBALS
@@ -29,9 +30,9 @@ fn main() {
 // Inits rocket
 pub fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/register", routes![routes::register])
-        .mount("/pair", routes![routes::pair])
-        .mount("/send", routes![routes::send])
-        .mount("/key", routes![routes::get_key])
-        .register(catchers![routes::not_found])
+        .mount("/register", routes![routes::register::register])
+        .mount("/pair", routes![routes::pair::pair])
+        .mount("/send", routes![routes::send::send])
+        .mount("/key", routes![routes::key::get_key])
+        .register(catchers![routes::generics::not_found])
 }

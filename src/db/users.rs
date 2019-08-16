@@ -97,6 +97,37 @@ impl User {
     }
 }
 
+//// Checks if both the from and the to device exist or not
+//// true: Both exist
+//// false: At least one doesn't exist
+//pub fn check_from_to_exists(from: &String, to: &String) -> Result<(), String> {
+//    // Check if the from device ID exists
+//    match device_id_exists(from) {
+//        Ok(result) => {
+//            if result == false {
+//                return Err("from: ".to_owned() + from + " doesn\'t exist");
+//            }
+//        }
+//        Err(err) => {
+//            return Err(err.to_string());
+//        }
+//    };
+//
+//    // Check if the to device ID exists
+//    match device_id_exists(to) {
+//        Ok(result) => {
+//            if result == false {
+//                return Err( "to: ".to_owned() + to + " doesn\'t exist");
+//            }
+//        }
+//        Err(err) => {
+//            return Err(err.to_string());
+//        }
+//    };
+//
+//    Ok(())
+//}
+
 // checks if the device_id exists
 // true: if the device_id does exist
 // false: if the device_id doesn't exist

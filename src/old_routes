@@ -1,0 +1,7 @@
+// /// Rocket routes
+// use crate::db::paired::{create, is_paired};
+// use crate::db::users::device_id_exists;
+// use crate::db::users::User;
+// use crate::json_generic::{JsonGeneric, JsonGenericCodes};
+// use crate::push::push_notification;
+// use rocket_contrib::json::Json;
